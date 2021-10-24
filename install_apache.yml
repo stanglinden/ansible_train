@@ -4,16 +4,40 @@
   become: true
   tasks:
 
-  - name: update repository index
+  - name: update yum repository index
     dnf:
       update_cache: yes      
+    when: ansible_distribution in ["RedHat", "Centos"]
 
-  - name: Install Apache2 package
+  - name: update apt repository index
+    apt:
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: Install Apache2 yum package
     dnf:
       name: httpd
       state: latest
 
-  - name: add php support for apache
+  - name: Install Apache2 apt package
+    apt:
+      name: apache2
+      state: latest
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+  - name: add php support for yum apache
     dnf:
       name: php, php-mysqlnd, php-pdo, php-gd, php-mbstring 
       state: latest
+    when: ansible_distribution in ["RedHat", "Centos"]
+
+  - name: add php support for apt apache
+    apt: 
+      name: libabache2-mod-php
+      state: latest
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+#  - name: update firewall on RedHat/Centos
+#  - name: start httpd on RedHat/Centos
+    
+
