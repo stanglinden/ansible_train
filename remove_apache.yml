@@ -4,16 +4,25 @@
   become: true
   tasks:
 
-  - name: update repository index
+  - name: Remove Apache2 and php package for RedHat/Centos
     dnf:
-      update_cache: yes      
-
-  - name: Remove Apache2 package
-    dnf:
-      name: httpd
+      name: 
+        - httpd
+        - php, php-mysqlnd, php-pdo, php-gd, php-mbstring 
       state: absent
+      update_cache: yes
+    when: ansible_distribution in ["RedHat", "Centos"]
 
-  - name: remove php support for apache
-    dnf:
-      name: php, php-mysqlnd, php-pdo, php-gd, php-mbstring 
+  - name: remove Apache2 and php package for Debian/Ubuntu
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
       state: absent
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+
+#  - name: update firewall on RedHat/Centos
+#  - name: start httpd on RedHat/Centos
+    
+
