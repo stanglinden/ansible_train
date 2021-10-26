@@ -1,5 +1,10 @@
-ansible apache_package=apache2 php_package=libapache2-mod-php
-ansible1 apache_package=httpd php_package=php
-ansible2 apache_package=httpd php_package=php
-ansible3 apache_package=httpd php_package=php
-ansible4 apache_package=httpd php_package=php
+[web_servers]
+ansible
+ansible1
+
+[db_servers]
+ansible2
+ansible3
+
+[file_servers]
+ansible4

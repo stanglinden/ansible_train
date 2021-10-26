@@ -4,13 +4,23 @@
   become: true
   tasks:
 
-  - name: Install Apache and php 
+  - name: Install Apache and php for Ubuntu servers
     package:
       name: 
-        - "{{ apache_package }}"
-        - "{{ php_package }}" 
+        - apache2 
+        - libapache2-mod-php 
       state: latest
       update_cache: yes
+    when: ansible_distribution in [ "Ubuntu", "Debian" ]
+
+  - name: Install Apache and php for RedHat servers
+    package:
+      name: 
+        - http 
+        - php 
+      state: latest
+      update_cache: yes
+    when: ansible_distribution in [ "RedHat", "CentOS" ]
 
 #  - name: update firewall on RedHat/Centos
 #  - name: start httpd on RedHat/Centos
