@@ -8,3 +8,6 @@ ansible3
 
 [file_servers]
 ansible4
+
+[workstations]
+ansible2
