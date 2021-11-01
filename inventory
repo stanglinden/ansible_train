@@ -1,13 +1,13 @@
 [web_servers]
-ansible
-ansible1
+ansible.lindenhouse.lan
+ansible1.lindenhouse.lan
 
 [db_servers]
-ansible2
-ansible3
+ansible2.lindenhouse.lan
+ansible3.lindenhouse.lan
 
 [file_servers]
-ansible4
+ansible4.lindenhouse.lan
 
 [workstations]
-ansible2
+ansible2.lindenhouse.lan
