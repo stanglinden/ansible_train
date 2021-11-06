@@ -1,121 +1,44 @@
 ---
-
-- hosts: all
-  become: true
-  pre_tasks:
-
-  - name: Update repo cache (RedHat)
-    tags: always
-    dnf: 
-      update_cache: yes
-    changed_when: false 
-    when: ansible_distribution in [ "RedHat", "CentOS" ]
-
-  - name: Update repo cache (Ubuntu)
-    tags: always
-    apt:
-      update_cache: yes
-    changed_when: false 
-    when: ansible_distribution in [ "Ubuntu", "Debian" ]
-
-- hosts: all
-  become: true
-  tasks:
-   
-  - name: add ssh key for simone
-    tags: always,user
-    authorized_key: 
-      user: simone
-      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC0wgMtKp21bvai9i2m57mu3CwQ01Sa9nTtyHGL4QpgsvFKdQInlEYnyjJYo+mszogA494wyuOG2YYP0lEYJNV/3vpv2vgqSc0A7jRdhUEogb+CUBhjKDfY/TMh0p7V4eKp1SofH/gH2koQUEONTaGgpmcl0HVrhOhm8oWWaUSg51bJlCy3HwUJ3LxdcYVymfS38k00QNAjVPZ3gDOdqjy35KL6ij/raJrgAvCtV5v7ihNyr09vcGwgznHqa7guwc9zAhrv5K2Qe686pkL1GskbuhJ9vHz4cXxxss06WWKfBB6D2rQ/J1y1WVkd5uuhcBMerBPJGR+EQbEYBzRrooA+Im+AjNlOzhSobQMz41bql/1FrVliPlEPogA/rK0AM4PWXPjcYlPF5CFW9P7PnEZx/DWVf2fBDrGGBPMXsSXtuL3DubweaktyRfS/sVDd5bNoms1Vge0r4kmfyVc5HmQ3LlpOx/Uj0+Au/4HT9rJRUT9Fq1pj2vi1bD/DRWZm9Mc= ansible@control"
-
-- hosts: workstations
-  become: true
-  tasks:
-
-  - name: install unzip
-    package:
-      name: unzip
-
-- hosts: web_servers
-  become: true
-  tasks:
-
-  - name: Install Apache and php for Ubuntu servers
-    tags: apache,apache2,ubuntu
-    package:
-      name: 
-        - apache2 
-        - libapache2-mod-php 
-      state: latest
-    when: ansible_distribution in [ "Ubuntu", "Debian" ]
-
-  - name: Install Apache and php for RedHat servers
-    tags: apache,apache2,redhat
-    package:
-      name: 
-        - httpd 
-        - php 
-      state: latest
-    when: ansible_distribution in [ "RedHat", "CentOS" ]
-
-  - name: start httpd(RedHat/CentOS_
-    tags: apache,apache2,redhat,httpd,centos
-    service: 
-      name: httpd
-      state: started
-      enabled: yes
-    when: ansible_distribution in [ "RedHat", "CentOS" ]
-   
-  - name: change e-mail address for admin
-    tags: apache,apache2,httpd
-    lineinfile: 
-      path: /etc/httpd/conf/httpd.conf
-      regexp: '^ServerAdmin'
-      line: ServerAdmin somebody@somewhere.net
-    when: ansible_distribution in [ "RedHat", "CentOS" ]
-    register: httpd
-
-  - name: restart httpd (CentOS/Redhat)     
-    tags: apache,centos,httpd
-    service: 
-      name: httpd
-      state: restarted
-    when: httpd.changed
-
-  - name: copy default html file for site
-    tags: apache,apache2,httpd
-    copy:
-      src: default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
-
-- hosts: db_servers
-  become: true
-  tasks: 
-  
-  - name: install mariadb package (RedHat)
-    tags: db,mariadb,redhat
-    dnf:
-      name: mariadb
-      state: latest
-    when: ansible_distribution in [ "RedHat", "CentOS" ]
-
-  - name: install mariadb package (Ubuntu)
-    tags: db,mariadb,ubuntu
-    apt:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution in [ "Ubuntu", "Debian" ]
-     
-- hosts: file_servers
-  become: true
-  tasks: 
-  
-  - name: install samba package (ALL) 
-    tags: samba,all
-    package:
-      name: samba
-      state: latest
-  
+ 
+ - hosts: all
+   become: true
+   pre_tasks:
+ 
+   - name: update repository index (CentOS)
+     tags: always
+     dnf:
+       update_cache: yes
+     changed_when: false
+     when: ansible_distribution == "CentOS"
+ 
+   - name: update repository index (Ubuntu)
+     tags: always
+     apt:
+       update_cache: yes
+     changed_when: false
+     when: ansible_distribution == "Ubuntu"
+ 
+ - hosts: all
+   become: true
+   roles:
+     - base
+    
+ - hosts: workstations
+   become: true
+   roles:
+     - workstations
+ 
+ - hosts: web_servers
+   become: true
+   roles:
+     - web_servers
+ 
+ - hosts: db_servers
+   become: true
+   roles:
+     - db_servers
+ 
+ - hosts: file_servers
+   become: true
+   roles:
+     - file_servers
